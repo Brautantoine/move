@@ -21,10 +21,23 @@
 #											#
 #########################################################################################
 
+display_help()
+{
+	echo "move - version 0.0 (beta)"
+	echo "A short script utils to pack all the file in current directory to a new directory"
+	echo "Usage : move <dest_dir>"
+}
 
 if [ -z $1 ]; then
 	echo "invalid no arg invoke"
+	echo " "
+	display_help
 	exit 1
+fi
+
+if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+	display_help
+	exit 0
 fi
 
 if [ ! -d $1 ]; then
