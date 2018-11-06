@@ -27,13 +27,22 @@ display_help()
 A short script utils to pack all the files in current directory
 into a new directory
 
-	Usage : move <dest_dir>"
+	Usage : move [options] <dest_dir>
+
+	Options :
+	-h | -H | --help - Show this message
+	-v | --version   - Show version
+	-s | --source	 - Not implemented yet"
 }
 
-opt_help=0
-opt_source=0
+display_version()
+{
+	echo "0.2"
+}
 
-while getopts "hHs-:" opt ; do
+no_opt=1
+
+while getopts ":hHsv-:" opt ; do
 	case $opt in
 		h ) 
 			display_help 
@@ -43,6 +52,10 @@ while getopts "hHs-:" opt ; do
 			exit 0 ;;
 		s )
 			echo source
+			no_opt=0
+			exit 0 ;;
+		v )
+			display_version
 			exit 0 ;;
 		- ) case $OPTARG in
 			help ) 
@@ -50,13 +63,14 @@ while getopts "hHs-:" opt ; do
 				exit 0 ;;
 			source )
 				echo source
+				no_opt=0
 				exit 0 ;;
 			version )
-				echo 0.2 
-				#exit 0 ;;
-;;
+				display_version 
+				exit 0 ;;
 			* )
 				echo "Unrecognized option : --$OPTARG"
+				display_help
 				exit 1 ;;
 			esac ;;
 	esac
@@ -74,26 +88,27 @@ fi
 #	display_help
 #	exit 0
 #fi
-
-if [ ! -d $1 ]; then
-	echo "creating $1"
-	mkdir -p -- $1
-fi
-for item in  ./*
-do
-	count=$((count+1))
-done
-echo Number total of files : $count
-for file in * 
-do
-	progress=$((progress+1))
-	if [[ ! ${file} == $1 ]];then
-		echo moving \[${file}\] in $1  \[$(((progress*100/count*100)/100))%\]
-		mv ${file} $1
-	else
-		echo skipping \[${file}\]  \[$(((progress*100/count*100)/100))%\]
+if [ $no_opt -ne 0 ]; then
+	if [ ! -d $1 ]; then
+		echo "creating $1"
+		mkdir -p -- $1
 	fi
-	
-done
-echo transfer finished with succes
+	for item in  ./*
+	do
+		count=$((count+1))
+	done
+	echo Number total of files : $count
+	for file in * 
+	do
+		progress=$((progress+1))
+		if [[ ! ${file} == $1 ]];then
+			echo moving \[${file}\] in $1  \[$(((progress*100/count*100)/100))%\]
+			mv ${file} $1
+		else
+			echo skipping \[${file}\]  \[$(((progress*100/count*100)/100))%\]
+		fi
+		
+	done
+	echo transfer finished with succes
+fi
 exit 0
