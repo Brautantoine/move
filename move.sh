@@ -27,12 +27,13 @@ display_help()
 A short script utils to pack all the files in current directory
 into a new directory
 
-	Usage : move [options] <dest_dir>
+	Usage : move [options] <dest_dir> <regexp>
 
 	Options :
 	-h | -H | --help - Show this message
 	-v | --version   - Show version
-	-s | --source	 - Not implemented yet"
+	-s | --source	 - Not implemented yet
+	-i | --ignore	 - Ignore files whithout regexp"
 }
 
 display_version()
@@ -41,8 +42,9 @@ display_version()
 }
 
 no_opt=1
+opt_ign=0
 
-while getopts ":hHsv-:" opt ; do
+while getopts ":hHsvi-:" opt ; do
 	case $opt in
 		h ) 
 			display_help 
@@ -57,6 +59,9 @@ while getopts ":hHsv-:" opt ; do
 		v )
 			display_version
 			exit 0 ;;
+		i )
+			no_opt=0
+			opt_ign=1 ;;
 		- ) case $OPTARG in
 			help ) 
 				display_help
@@ -68,6 +73,9 @@ while getopts ":hHsv-:" opt ; do
 			version )
 				display_version 
 				exit 0 ;;
+			ignore )
+				no_opt=0
+				opt_ign=1 ;;
 			* )
 				echo "Unrecognized option : --$OPTARG"
 				display_help
@@ -88,7 +96,40 @@ fi
 #	display_help
 #	exit 0
 #fi
+
+if [ $opt_ign -ne 0 ]; then
+
+	if [ -z $2 ]; then
+		echo missing argument
+		display_help
+		exit 1
+	fi
+	
+	if [ ! -d $1 ]; then
+		echo "creating $1"
+		mkdir -p -- $1
+	fi
+
+	for item in  ./*
+	do
+		count=$((count+1))
+	done
+
+	echo Number total of files : $count
+	
+	for chaine in *
+	do
+		echo "$chaine" | grep "$2" > /dev/null
+		if [ $? -eq 0 ]; then
+			echo move $chaine to $1
+		else
+			echo skipping $chaine
+		fi
+	done	
+fi
+
 if [ $no_opt -ne 0 ]; then
+
 	if [ ! -d $1 ]; then
 		echo "creating $1"
 		mkdir -p -- $1
