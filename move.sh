@@ -23,7 +23,7 @@
 
 display_help()
 {
-	echo "move - version 0.0 (beta)
+	echo "move - version 1.0 (beta)
 A short script utils to pack all the files in current directory
 into a new directory
 
@@ -38,7 +38,7 @@ into a new directory
 
 display_version()
 {
-	echo "0.2"
+	echo "1.0"
 }
 
 no_opt=1
@@ -117,13 +117,15 @@ if [ $opt_ign -ne 0 ]; then
 
 	echo Number total of files : $count
 	
-	for chaine in *
+	for file in *
 	do
-		echo "$chaine" | grep "$2" > /dev/null
+		progress=$((progress+1))
+		echo "$file" | grep "$2" > /dev/null
 		if [ $? -eq 0 ]; then
-			echo move $chaine to $1
+			echo moving \[${file}\] in $1  \[$(((progress*100/count*100)/100))%\]
+			mv ${file} $1
 		else
-			echo skipping $chaine
+			echo skipping \[${file}\]  \[$(((progress*100/count*100)/100))%\]
 		fi
 	done	
 fi
