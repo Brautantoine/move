@@ -23,28 +23,30 @@
 
 display_help()
 {
-	echo "move - version 1.0 (beta)
+	echo "move - version 1.0.1 (alpha)
 A short script utils to pack all the files in current directory
 into a new directory
 
-	Usage : move [options] <dest_dir> <regexp>
+	Usage : move [options] <dest_dir>
+		move [options] <dest_dir> <regexp>
 
 	Options :
 	-h | -H | --help - Show this message
 	-v | --version   - Show version
 	-s | --source	 - Not implemented yet
-	-i | --ignore	 - Ignore files whithout regexp"
+	-p | --precise	 - Skip files whithout regexp
+"
 }
 
 display_version()
 {
-	echo "1.0"
+	echo "move - version 1.0.1 (alpha)"
 }
 
 no_opt=1
-opt_ign=0
+opt_prec=0
 
-while getopts ":hHsvi-:" opt ; do
+while getopts ":hHvsp-:" opt ; do
 	case $opt in
 		h ) 
 			display_help 
@@ -59,9 +61,9 @@ while getopts ":hHsvi-:" opt ; do
 		v )
 			display_version
 			exit 0 ;;
-		i )
+		p )
 			no_opt=0
-			opt_ign=1 ;;
+			opt_prec=1 ;;
 		- ) case $OPTARG in
 			help ) 
 				display_help
@@ -73,14 +75,18 @@ while getopts ":hHsvi-:" opt ; do
 			version )
 				display_version 
 				exit 0 ;;
-			ignore )
+			precise )
 				no_opt=0
-				opt_ign=1 ;;
+				opt_prec=1 ;;
 			* )
 				echo "Unrecognized option : --$OPTARG"
 				display_help
 				exit 1 ;;
 			esac ;;
+		* )
+			echo Unrecognized option : $opt
+			display_help
+			exit 1 ;;
 	esac
 done
 shift $(($OPTIND-1))
@@ -97,7 +103,7 @@ fi
 #	exit 0
 #fi
 
-if [ $opt_ign -ne 0 ]; then
+if [ $opt_prec -ne 0 ]; then
 
 	if [ -z $2 ]; then
 		echo missing argument
@@ -122,8 +128,12 @@ if [ $opt_ign -ne 0 ]; then
 		progress=$((progress+1))
 		echo "$file" | grep "$2" > /dev/null
 		if [ $? -eq 0 ]; then
-			echo moving \[${file}\] in $1  \[$(((progress*100/count*100)/100))%\]
-			mv ${file} $1
+			if [[ ! ${file} == $1 ]]; then
+				echo moving \[${file}\] in $1  \[$(((progress*100/count*100)/100))%\]
+				mv ${file} $1
+			else
+				echo skipping \[${file}\] in $1 \[$(((progress*100/count*100)/100))%\]
+			fi
 		else
 			echo skipping \[${file}\]  \[$(((progress*100/count*100)/100))%\]
 		fi
