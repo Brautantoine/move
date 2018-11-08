@@ -90,15 +90,17 @@ while getopts ":hHvsp-:" opt ; do
 	esac
 done
 shift $(($OPTIND-1))
+
+dest_dir=$1
 			
-if [ -z $1 ]; then
+if [ -z ${dest_dir} ]; then
 	echo "invalid no arg invoke"
 	echo " "
 	display_help
 	exit 1
 fi
 
-#if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+#if [[ "${dest_dir}" == "--help" || "${dest_dir}" == "-h" ]]; then
 #	display_help
 #	exit 0
 #fi
@@ -111,9 +113,9 @@ if [ $opt_prec -ne 0 ]; then
 		exit 1
 	fi
 	
-	if [ ! -d $1 ]; then
-		echo "creating $1"
-		mkdir -p -- $1
+	if [ ! -d ${dest_dir} ]; then
+		echo "creating ${dest_dir}"
+		mkdir -p -- ${dest_dir}
 	fi
 
 	for item in  ./*
@@ -128,11 +130,11 @@ if [ $opt_prec -ne 0 ]; then
 		progress=$((progress+1))
 		echo "$file" | grep "$2" > /dev/null
 		if [ $? -eq 0 ]; then
-			if [[ ! ${file} == $1 ]]; then
-				echo moving \[${file}\] in $1  \[$(((progress*100/count*100)/100))%\]
-				mv ${file} $1
+			if [[ ! ${file} == ${dest_dir} ]]; then
+				echo moving \[${file}\] in ${dest_dir}  \[$(((progress*100/count*100)/100))%\]
+				mv ${file} ${dest_dir}
 			else
-				echo skipping \[${file}\] in $1 \[$(((progress*100/count*100)/100))%\]
+				echo skipping \[${file}\] in ${dest_dir} \[$(((progress*100/count*100)/100))%\]
 			fi
 		else
 			echo skipping \[${file}\]  \[$(((progress*100/count*100)/100))%\]
@@ -142,9 +144,9 @@ fi
 
 if [ $no_opt -ne 0 ]; then
 
-	if [ ! -d $1 ]; then
-		echo "creating $1"
-		mkdir -p -- $1
+	if [ ! -d ${dest_dir} ]; then
+		echo "creating ${dest_dir}"
+		mkdir -p -- ${dest_dir}
 	fi
 	for item in  ./*
 	do
@@ -154,9 +156,9 @@ if [ $no_opt -ne 0 ]; then
 	for file in * 
 	do
 		progress=$((progress+1))
-		if [[ ! ${file} == $1 ]];then
-			echo moving \[${file}\] in $1  \[$(((progress*100/count*100)/100))%\]
-			mv ${file} $1
+		if [[ ! ${file} == ${dest_dir} ]];then
+			echo moving \[${file}\] in ${dest_dir}  \[$(((progress*100/count*100)/100))%\]
+			mv ${file} ${dest_dir}
 		else
 			echo skipping \[${file}\]  \[$(((progress*100/count*100)/100))%\]
 		fi
