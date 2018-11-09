@@ -23,7 +23,7 @@
 
 display_help()
 {
-	echo "move - version 1.0.1 (alpha)
+	echo "move - version 1.1.0 (alpha)
 A short script utils to pack all the files in current directory
 into a new directory
 
@@ -35,18 +35,20 @@ into a new directory
 	-v | --version   - Show version
 	-s | --source	 - Not implemented yet
 	-p | --precise	 - Skip files whithout regexp
+	-d | --hidden	 - Move hidden files too
 "
 }
 
 display_version()
 {
-	echo "move - version 1.0.1 (alpha)"
+	echo "move - version 1.1.0 (alpha)"
 }
 
 no_opt=1
 opt_prec=0
+opt_hid=0
 
-while getopts ":hHvsp-:" opt ; do
+while getopts ":dhHvsp-:" opt ; do
 	case $opt in
 		h ) 
 			display_help 
@@ -64,6 +66,9 @@ while getopts ":hHvsp-:" opt ; do
 		p )
 			no_opt=0
 			opt_prec=1 ;;
+		d )
+			no_opt=0
+			opt_hid=1 ;;
 		- ) case $OPTARG in
 			help ) 
 				display_help
@@ -104,6 +109,9 @@ fi
 #	display_help
 #	exit 0
 #fi
+if [ $opt_hid -ne 0 ]; then
+	shopt -s dotglob
+fi
 
 if [ $opt_prec -ne 0 ]; then
 
@@ -166,4 +174,9 @@ if [ $no_opt -ne 0 ]; then
 	done
 	echo transfer finished with succes
 fi
+
+if [ $opt_hid -ne 0 ]; then
+	shopt -u dotglob
+fi
+
 exit 0
