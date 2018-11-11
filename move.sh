@@ -23,7 +23,7 @@
 
 display_help()
 {
-	echo "move - version 1.1.0 (alpha)
+	echo "move - version 1.2.0 (alpha)
 A short script utils to pack all the files in current directory
 into a new directory
 
@@ -35,20 +35,22 @@ into a new directory
 	-v | --version   - Show version
 	-s | --source	 - Not implemented yet
 	-p | --precise	 - Skip files whithout regexp
+	-i | --ignore	 - Skip files with regexp
 	-d | --hidden	 - Move hidden files too
 "
 }
 
 display_version()
 {
-	echo "move - version 1.1.0 (alpha)"
+	echo "move - version 1.2.0 (alpha)"
 }
 
 no_opt=1
 opt_prec=0
 opt_hid=0
+opt_ign=0
 
-while getopts ":dhHvsp-:" opt ; do
+while getopts ":idhHvsp-:" opt ; do
 	case $opt in
 		h ) 
 			display_help 
@@ -69,6 +71,9 @@ while getopts ":dhHvsp-:" opt ; do
 		d )
 			no_opt=0
 			opt_hid=1 ;;
+		i )
+			no_opt=1
+			opt_ign=1 ;;
 		- ) case $OPTARG in
 			help ) 
 				display_help
@@ -83,6 +88,9 @@ while getopts ":dhHvsp-:" opt ; do
 			precise )
 				no_opt=0
 				opt_prec=1 ;;
+			ignore )
+				no_opt=0
+				opt_ign=1 ;;
 			* )
 				echo "Unrecognized option : --$OPTARG"
 				display_help
@@ -138,6 +146,43 @@ if [ $opt_prec -ne 0 ]; then
 		progress=$((progress+1))
 		echo "$file" | grep "$2" > /dev/null
 		if [ $? -eq 0 ]; then
+			if [[ ! ${file} == ${dest_dir} ]]; then
+				echo moving \[${file}\] in ${dest_dir}  \[$(((progress*100/count*100)/100))%\]
+				mv ${file} ${dest_dir}
+			else
+				echo skipping \[${file}\] in ${dest_dir} \[$(((progress*100/count*100)/100))%\]
+			fi
+		else
+			echo skipping \[${file}\]  \[$(((progress*100/count*100)/100))%\]
+		fi
+	done	
+fi
+
+if [ $opt_ign -ne 0 ]; then
+
+	if [ -z $2 ]; then
+		echo missing argument
+		display_help
+		exit 1
+	fi
+	
+	if [ ! -d ${dest_dir} ]; then
+		echo "creating ${dest_dir}"
+		mkdir -p -- ${dest_dir}
+	fi
+
+	for item in  ./*
+	do
+		count=$((count+1))
+	done
+
+	echo Number total of files : $count
+	
+	for file in *
+	do
+		progress=$((progress+1))
+		echo "$file" | grep "$2" > /dev/null
+		if [ ! $? -eq 0 ]; then
 			if [[ ! ${file} == ${dest_dir} ]]; then
 				echo moving \[${file}\] in ${dest_dir}  \[$(((progress*100/count*100)/100))%\]
 				mv ${file} ${dest_dir}
