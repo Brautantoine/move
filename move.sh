@@ -72,7 +72,7 @@ while getopts ":idhHvsp-:" opt ; do
 			no_opt=0
 			opt_hid=1 ;;
 		i )
-			no_opt=1
+			no_opt=0
 			opt_ign=1 ;;
 		- ) case $OPTARG in
 			help ) 
