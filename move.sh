@@ -23,7 +23,7 @@
 
 display_help()
 {
-	echo "move - version 1.2.0 (alpha)
+	echo "move - version 1.2.5 (alpha)
 A short script utils to pack all the files in current directory
 into a new directory
 
@@ -42,13 +42,43 @@ into a new directory
 
 display_version()
 {
-	echo "move - version 1.2.0 (alpha)"
+	echo "move - version 1.2.5 (alpha)"
+}
+
+check_for_dest_dir()
+{
+	if [ ! -d ${dest_dir} ]; then
+		if [ ! -f ${dest_dir} ]; then
+		echo "creating ${dest_dir}"
+		mkdir -p -- ${dest_dir}
+		else
+		echo -e "${dest_dir} already exist and is not a driectory\nCreating ${dest_dir}.temp, it will be rename at the end."
+		dest_dir=${dest_dir}.temp		
+		mkdir -p -- ${dest_dir}
+		renam_dest_dir=1
+		fi
+	fi
+}
+
+check_for_rename()
+{
+	if [ ${renam_dest_dir} -ne 0 ]; then
+		dest_dir_old=${dest_dir}
+		dest_dir=$(echo ${dest_dir} | sed -e "s/\.temp$//")
+		mv ${dest_dir_old} ${dest_dir}
+		echo "renaming ${dest_dir_old} to ${dest_dir}"
+	fi
 }
 
 no_opt=1
 opt_prec=0
 opt_hid=0
 opt_ign=0
+renam_dest_dir=0
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m'
 
 while getopts ":idhHvsp-:" opt ; do
 	case $opt in
@@ -197,10 +227,7 @@ fi
 
 if [ $no_opt -ne 0 ]; then
 
-	if [ ! -d ${dest_dir} ]; then
-		echo "creating ${dest_dir}"
-		mkdir -p -- ${dest_dir}
-	fi
+	check_for_dest_dir
 	for item in  ./*
 	do
 		count=$((count+1))
@@ -210,15 +237,17 @@ if [ $no_opt -ne 0 ]; then
 	do
 		progress=$((progress+1))
 		if [[ ! ${file} == ${dest_dir} ]];then
-			echo moving \[${file}\] in ${dest_dir}  \[$(((progress*100/count*100)/100))%\]
+			echo -e ${GREEN}moving${NC} \[${file}\] in ${dest_dir}  \[$(((progress*100/count*100)/100))%\]
 			mv ${file} ${dest_dir}
 		else
-			echo skipping \[${file}\]  \[$(((progress*100/count*100)/100))%\]
+			echo -e ${RED}skipping${NC} \[${file}\]  \[$(((progress*100/count*100)/100))%\]
 		fi
 		
 	done
 	echo transfer finished with succes
 fi
+
+check_for_rename
 
 if [ $opt_hid -ne 0 ]; then
 	shopt -u dotglob
