@@ -99,7 +99,6 @@ while getopts ":idhHvsp-:" opt ; do
 			no_opt=0
 			opt_prec=1 ;;
 		d )
-			no_opt=0
 			opt_hid=1 ;;
 		i )
 			no_opt=0
@@ -121,6 +120,8 @@ while getopts ":idhHvsp-:" opt ; do
 			ignore )
 				no_opt=0
 				opt_ign=1 ;;
+			hidden )
+				opt_hid=1 ;;
 			* )
 				echo "Unrecognized option : --$OPTARG"
 				display_help
@@ -177,10 +178,10 @@ if [ $opt_prec -ne 0 ]; then
 		echo "$file" | grep "$2" > /dev/null
 		if [ $? -eq 0 ]; then
 			if [[ ! ${file} == ${dest_dir} ]]; then
-				echo moving \[${file}\] in ${dest_dir}  \[$(((progress*100/count*100)/100))%\]
+				echo -e ${GREEN}moving${NC} \[${file}\] in ${dest_dir}  \[$(((progress*100/count*100)/100))%\]
 				mv ${file} ${dest_dir}
 			else
-				echo skipping \[${file}\] in ${dest_dir} \[$(((progress*100/count*100)/100))%\]
+				echo -e  ${RED}skipping${NC} \[${file}\] \[$(((progress*100/count*100)/100))%\]
 			fi
 		else
 			echo skipping \[${file}\]  \[$(((progress*100/count*100)/100))%\]
@@ -196,10 +197,7 @@ if [ $opt_ign -ne 0 ]; then
 		exit 1
 	fi
 	
-	if [ ! -d ${dest_dir} ]; then
-		echo "creating ${dest_dir}"
-		mkdir -p -- ${dest_dir}
-	fi
+	chekc_for_dest_dir
 
 	for item in  ./*
 	do
@@ -214,10 +212,10 @@ if [ $opt_ign -ne 0 ]; then
 		echo "$file" | grep "$2" > /dev/null
 		if [ ! $? -eq 0 ]; then
 			if [[ ! ${file} == ${dest_dir} ]]; then
-				echo moving \[${file}\] in ${dest_dir}  \[$(((progress*100/count*100)/100))%\]
+				echo -e  ${GREEN}moving${NC} \[${file}\] in ${dest_dir}  \[$(((progress*100/count*100)/100))%\]
 				mv ${file} ${dest_dir}
 			else
-				echo skipping \[${file}\] in ${dest_dir} \[$(((progress*100/count*100)/100))%\]
+				echo -e  ${GREEN}skipping${NC} \[${file}\]  \[$(((progress*100/count*100)/100))%\]
 			fi
 		else
 			echo skipping \[${file}\]  \[$(((progress*100/count*100)/100))%\]
