@@ -160,10 +160,7 @@ if [ $opt_prec -ne 0 ]; then
 		exit 1
 	fi
 	
-	if [ ! -d ${dest_dir} ]; then
-		echo "creating ${dest_dir}"
-		mkdir -p -- ${dest_dir}
-	fi
+	check_for_dest_dir
 
 	for item in  ./*
 	do
@@ -184,7 +181,7 @@ if [ $opt_prec -ne 0 ]; then
 				echo -e  ${RED}skipping${NC} \[${file}\] \[$(((progress*100/count*100)/100))%\]
 			fi
 		else
-			echo skipping \[${file}\]  \[$(((progress*100/count*100)/100))%\]
+			echo -e ${RED}skipping${NC} \[${file}\]  \[$(((progress*100/count*100)/100))%\]
 		fi
 	done	
 fi
@@ -215,10 +212,10 @@ if [ $opt_ign -ne 0 ]; then
 				echo -e  ${GREEN}moving${NC} \[${file}\] in ${dest_dir}  \[$(((progress*100/count*100)/100))%\]
 				mv ${file} ${dest_dir}
 			else
-				echo -e  ${GREEN}skipping${NC} \[${file}\]  \[$(((progress*100/count*100)/100))%\]
+				echo -e  ${RED}skipping${NC} \[${file}\]  \[$(((progress*100/count*100)/100))%\]
 			fi
 		else
-			echo skipping \[${file}\]  \[$(((progress*100/count*100)/100))%\]
+			echo -e ${RED}skipping${NC} \[${file}\]  \[$(((progress*100/count*100)/100))%\]
 		fi
 	done	
 fi
